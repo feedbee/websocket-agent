@@ -1,0 +1,16 @@
+body {
+	margin: 0;
+	padding: 0;
+}
+#wrapper {
+	max-width: 1200px;
+	min-width: 600px;
+	margin: 0 auto;
+}
+#header {
+	position: fixed;
+	background-color: white;
+}
+#canvas {
+	padding-top: 120px;
+}
