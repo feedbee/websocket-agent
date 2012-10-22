@@ -13,7 +13,8 @@ module WebSocketAgent
 
 					lines.each_with_index{ |line, i|
 						array = line.split
-						break unless array[0] =~ /cpu/   # 'cpu' entries always on top
+						cpuName = array[0]
+						break unless cpuName =~ /cpu/   # 'cpu' entries always on top
 
 						# Some machines list a 'cpu' and a 'cpu0'. In this case only
 						# return values for the numbered cpu entry.
@@ -22,7 +23,11 @@ module WebSocketAgent
 						end
 
 						vals = array[1..-1].map{ |e| e = e.to_i }
-						hash[array[0]] = vals
+						valsHash = {}
+						[:user,:nice,:system,:idle,:iowait,:irq,:softirq].each_with_index { |key, index|
+							valsHash[key] = vals[index]
+						}
+						hash[cpuName] = valsHash
 					}
 
 					hash
