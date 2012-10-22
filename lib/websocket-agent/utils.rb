@@ -33,6 +33,22 @@ module WebSocketAgent
 					hash
 				end
 			end
+
+			module MemInfo
+				def self.get
+					memory_stat_file = "/proc/meminfo"
+					hash = {}
+
+					lines = IO.readlines memory_stat_file
+
+					lines.each do |line|
+						matches = line.match /(.*):\s*(\d+)( (.*))?/
+						hash[matches[1]] = {:value => matches[2].to_i, :units => matches[4]}
+					end
+
+					hash
+				end
+			end
 		end
 	end
 end

@@ -37,7 +37,9 @@ module WebSocketAgent
 		def self.getDefaultPlugins
 			[
 				WebSocketAgent::Server::Plugin::Uptime.new,
-				WebSocketAgent::Server::Plugin::CpuUsage.new
+				WebSocketAgent::Server::Plugin::CpuUsage.new,
+				WebSocketAgent::Server::Plugin::Processes.new,
+				WebSocketAgent::Server::Plugin::MemInfo.new
 			]
 		end
 	end
