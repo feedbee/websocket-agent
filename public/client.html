@@ -9,7 +9,7 @@
 <body>
 <div id="wrapper">
     <div id="header">
-        <h1>WebSockets Client</h1>
+        <h1>WebSockets Agent Client</h1>
         <button id="connect">Connect</button> <button id="start">Start</button> <button id="stop">Stop</button> 
         <input id="interval-value" type="text" style="width:40px;" value="1" /> <button id="interval">Set interval</button> 
         <button id="disconnect">Disconnect</button>
@@ -18,7 +18,9 @@
 </div>
 <script src="client.js"></script>
 <script>
-	var client = new AgentServerClient(function (msg) {$('#canvas').prepend("<div>" + msg + "</div>");});
+	var client = new AgentServerClient(function (msg) {
+		$('#canvas').prepend("<div class=\"data\">" + msg + "</div>");
+	});
 
 	$('#connect').on('click', client.connect);
 	$('#start').on('click', client.start);
