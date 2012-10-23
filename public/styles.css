@@ -17,3 +17,6 @@ body {
 .data {
 	margin: 5px 0;
 }
+canvas {
+	border: 1px solid black;
+}
