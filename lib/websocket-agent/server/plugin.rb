@@ -23,9 +23,9 @@ module WebSocketAgent
 					@command = 'uptime'
 				end
 				def parse (data)
-					matches = data.match(/ (.*) up  (.*),  (\d+) users,  load average: (.*), (.*), (.*)/)
-					{:time => matches[1], :uptime => matches[2], :users => matches[3],
-						:la1 => matches[4], :la5 => matches[5], :la15 => matches[6]}
+					matches = data.match(/ (.*) up\s+(.*),\s+(\d+) users,\s+load average: (.*), (.*), (.*)/)
+					{:time => matches[1].strip, :uptime => matches[2].strip, :users => matches[3].strip,
+						:la1 => matches[4].strip, :la5 => matches[5].strip, :la15 => matches[6].strip}
 				end
 			end
 
