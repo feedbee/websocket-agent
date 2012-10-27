@@ -11,12 +11,34 @@ body {
 	position: fixed;
 	background-color: white;
 }
+#server-status-header {
+	margin-bottom: 10px;
+}
+#server-status-header h1 {
+	margin-bottom: 4px;
+}
 #canvas {
 	padding-top: 120px;
 }
 .data {
 	margin: 5px 0;
 }
-canvas {
-	border: 1px solid black;
+.indicator-block canvas {
+	border: 1px solid #082F4A;
+	vertical-align: middle;
+}
+.indicator-block {
+	margin: 5px 0 10px 0;
+}
+.indicator-block h2 {
+	margin: 0;
+	font-size: 95%;
+}
+.indicator-block > div {
+	margin-bottom: 5px;
+	font-family: 'Ubuntu Mono', Console, Consolas, Courier, 'Courier New';
+	font-size: 95%;
+}
+.indicator-block .label {
+	font-size: 90%;
 }

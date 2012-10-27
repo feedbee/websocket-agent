@@ -101,9 +101,9 @@ module WebSocketAgent
 
 					{
 						:memory => {:total => values["MemTotal"], :used => values["MemTotal"] - values["MemFree"], :free => values["MemFree"],
-							:buffers => values["Buffers"], :cached => values["Cached"]},
-						:swap => {:total => values["SwapTotal"], :used => values["SwapTotal"] - values["SwapFree"], :free => values["SwapFree"],
-							:cached => values["SwapCached"]}
+							:apps => values["MemTotal"] - (values["MemFree"] + values["Buffers"] + values["Cached"] + values["SwapCached"]),
+							:buffers => values["Buffers"], :cached => values["Cached"], :swapCached => values["SwapCached"]},
+						:swap => {:total => values["SwapTotal"], :used => values["SwapTotal"] - values["SwapFree"], :free => values["SwapFree"]}
 					}
 				end
 			end

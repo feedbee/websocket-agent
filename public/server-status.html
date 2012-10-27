@@ -8,32 +8,38 @@
 </head>
 <body>
 <div id="wrapper">
-    <div id="header">
-        <h1>WebSockets Agent Client</h1>
-        <button id="connect">Connect</button> <button id="start">Start</button> <button id="stop">Stop</button> 
-        <input id="interval-value" type="text" style="width:40px;" value="1" /> <button id="interval">Set interval</button> 
-        <button id="disconnect">Disconnect</button>
-    <div id="processors">
-		<canvas id="processors-cpu0" width="300" height="20"></canvas> <span id="processors-cpu0-value"></span><br />
-		<canvas id="processors-cpu1" width="300" height="20"></canvas> <span id="processors-cpu1-value"></span><br />
-		<canvas id="processors-cpu2" width="300" height="20"></canvas> <span id="processors-cpu2-value"></span><br />
-		<canvas id="processors-cpu3" width="300" height="20"></canvas> <span id="processors-cpu3-value"></span><br />
+	<div id="server-status-header">
+		<h1>Server Status</h1>
+		<input id="server" type="text" style="width:150px;" value="localhost" />
+		<button id="start">Start</button> <button id="stop">Stop</button> 
+		<input id="interval-value" type="text" style="width:40px;" value="1" /> <button id="interval">Set interval</button>
+	</div>
+
+    <div id="processors" class="indicator-block">
+    	<h2>Processors</h2>
+		<div><span id="processors-cpu0-label" class="label"></span> <canvas id="processors-cpu0" width="300" height="20"></canvas> <span id="processors-cpu0-value"></span></div>
+		<div><span id="processors-cpu1-label" class="label"></span> <canvas id="processors-cpu1" width="300" height="20"></canvas> <span id="processors-cpu1-value"></span></div>
+		<div><span id="processors-cpu2-label" class="label"></span> <canvas id="processors-cpu2" width="300" height="20"></canvas> <span id="processors-cpu2-value"></span></div>
+		<div><span id="processors-cpu3-label" class="label"></span> <canvas id="processors-cpu3" width="300" height="20"></canvas> <span id="processors-cpu3-value"></span></div>
     </div>
-    <div id="memory">
-    	<canvas id="memory-canvas" width="300" height="20"></canvas> <span id="memory-value"></span><br />
+
+    <div id="memory" class="indicator-block">
+    	<h2>Memory</h2>
+    	<div><canvas id="memory-canvas" width="300" height="20"></canvas> <span id="memory-value"></span></div>
     </div>
-    <div id="swap">
-    	<canvas id="swap-canvas" width="300" height="20"></canvas> <span id="swap-value"></span><br />
+
+    <div id="swap" class="indicator-block">
+    	<h2>Swap</h2>
+    	<div><canvas id="swap-canvas" width="300" height="20"></canvas> <span id="swap-value"></span></div>
     </div>
-    </div><!-- #header -->
 </div>
 <script src="client.js"></script>
 
 <script>
 	var types = [
-		{key: 'iowait',  color: "rgb(80,20,170)"},
-		{key: 'system',  color: "rgb(10,150,20)"},
-		{key: 'user', color: "rgb(160,20,0)"}
+		{key: 'user', color: "rgb(26,184,49)"},
+		{key: 'system',  color: "rgb(242,143,12)"},
+		{key: 'iowait',  color: "rgb(232,23,23)"}
 	];
 	var f = function (allCpus) {
 		for (key in allCpus)
@@ -42,6 +48,8 @@
 
 			var canvas = $('#processors-' + key).get(0);
 			var valueField = $('#processors-' + key + '-value');
+			var labelField = $('#processors-' + key + '-label');
+			labelField.text(key);
 			var ctx = canvas.getContext("2d");
 
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -61,20 +69,18 @@
 	};
 
 	var typesMemory = [
-		{key: 'apps',    color: "rgb(10,150,20)"},
+		{key: 'apps',    color: "rgb(28,199,48)"},
 		{key: 'buffers', color: "rgb(160,20,0)"},
-		{key: 'cached',  color: "rgb(80,20,170)"}
+		{key: 'cached',  color: "rgb(242,143,12)"},
+		{key: 'swapCached',  color: "rgb(232,23,23)"}
+	];
+	var typesSwap = [
+		{key: 'used',  color: "rgb(232,23,23)"}
 	];
 	var f2 = function (meminfo) {
 		for (key in meminfo)
 		{
 			data = meminfo[key];
-
-			if (!data.buffers)
-			{
-				data.buffers = 0;
-			}
-			data.apps = data.used - data.cached - data.buffers;
 
 			var canvas = $('#' + key + '-canvas').get(0);
 			var valueField = $('#' + key + '-value');
@@ -84,7 +90,8 @@
 
 			var lastX = 0;
 			var width = canvas.width;
-			typesMemory.forEach(function(element) {
+			var types = (key == 'memory' ? typesMemory : typesSwap);
+			types.forEach(function(element) {
 				var value = data[element.key];
 				ctx.fillStyle = element.color;
 				segmentWidth = Math.round(value / data.total * width);
@@ -101,11 +108,23 @@
 		f2(jsonResponce.meminfo);
 	});
 
-	$('#connect').on('click', client.connect);
-	$('#start').on('click', client.start);
-	$('#stop').on('click', client.stop);
+	var serverAddress = $('#server').val();
+	if (serverAddress.length < 1)
+	{
+		serverAddress = 'localhost';
+	}
+	if (serverAddress.indexOf(':') < 0)
+	{
+		serverAddress += ":8080";
+	}
+
+	$('#start').on('click', function () { client.connect({
+		uri: "ws://" + serverAddress + "/",
+		onOpenCallback: client.start,
+		onErrorCallback: function (data) { alert('WebSockets error: ' + data); }
+	}); });
+	$('#stop').on('click', function () { client.stop(); client.disconnect(); });
 	$('#interval').on('click', function () {client.setInterval($('#interval-value').val());});
-	$('#disconnect').on('click', client.disconnect);
 </script>
 </body>
 </html>
