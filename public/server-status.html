@@ -17,34 +17,38 @@
 
     <div id="processors" class="indicator-block">
     	<h2>Processors</h2>
-		<div><span id="processors-cpu0-label" class="label"></span> <canvas id="processors-cpu0" width="300" height="20"></canvas> <span id="processors-cpu0-value"></span></div>
-		<div><span id="processors-cpu1-label" class="label"></span> <canvas id="processors-cpu1" width="300" height="20"></canvas> <span id="processors-cpu1-value"></span></div>
-		<div><span id="processors-cpu2-label" class="label"></span> <canvas id="processors-cpu2" width="300" height="20"></canvas> <span id="processors-cpu2-value"></span></div>
-		<div><span id="processors-cpu3-label" class="label"></span> <canvas id="processors-cpu3" width="300" height="20"></canvas> <span id="processors-cpu3-value"></span></div>
+		<div><span id="processors-cpu0-label" class="label">cpu0</span><canvas id="processors-cpu0"></canvas><span id="processors-cpu0-value" class="value"></span></div>
     </div>
 
     <div id="memory" class="indicator-block">
     	<h2>Memory</h2>
-    	<div><canvas id="memory-canvas" width="300" height="20"></canvas> <span id="memory-value"></span></div>
+    	<div><canvas id="memory-canvas" width="300" height="20"></canvas><span id="memory-value" class="value"></span></div>
     </div>
 
     <div id="swap" class="indicator-block">
     	<h2>Swap</h2>
-    	<div><canvas id="swap-canvas" width="300" height="20"></canvas> <span id="swap-value"></span></div>
+    	<div><canvas id="swap-canvas" width="300" height="20"></canvas><span id="swap-value" class="value"></span></div>
     </div>
 </div>
 <script src="client.js"></script>
 
 <script>
 	var types = [
-		{key: 'user', color: "rgb(26,184,49)"},
-		{key: 'system',  color: "rgb(242,143,12)"},
+		{key: 'user', color: "rgb(60,163,23)"},
+		{key: 'system',  color: "rgb(247,187,22)"},
 		{key: 'iowait',  color: "rgb(232,23,23)"}
 	];
-	var f = function (allCpus) {
+	var cpuStat = function (allCpus) {
 		for (key in allCpus)
 		{
 			data = allCpus[key];
+
+			if ($('#processors-' + key).length < 1)
+			{
+				$('#processors').append($('<div><span id="processors-' + key + '-label" class="label">' + key + '</span>'
+					+ '<canvas id="processors-' + key + '"></canvas>'
+					+ '<span id="processors-' + key + '-value" class="value"></span></div>'));
+			}
 
 			var canvas = $('#processors-' + key).get(0);
 			var valueField = $('#processors-' + key + '-value');
@@ -64,12 +68,20 @@
 				lastX += segmentWidth;
 			});
 
-			valueField.text(Math.round(data.usage * 1000) / 10 + ' %');
+			valueField.text(Math.round(data.usage * 1000) / 10 + '%');
+			if (data.usage >= 0.90)
+			{
+				valueField.addClass('warning');
+			}
+			else
+			{
+				valueField.removeClass('warning');
+			}
 		}
 	};
 
 	var typesMemory = [
-		{key: 'apps',    color: "rgb(28,199,48)"},
+		{key: 'apps',    color: "rgb(33,145,29)"},
 		{key: 'buffers', color: "rgb(160,20,0)"},
 		{key: 'cached',  color: "rgb(242,143,12)"},
 		{key: 'swapCached',  color: "rgb(232,23,23)"}
@@ -77,7 +89,7 @@
 	var typesSwap = [
 		{key: 'used',  color: "rgb(232,23,23)"}
 	];
-	var f2 = function (meminfo) {
+	var memInfo = function (meminfo) {
 		for (key in meminfo)
 		{
 			data = meminfo[key];
@@ -99,13 +111,21 @@
 				lastX = lastX + segmentWidth;
 			});
 
-			valueField.text(Math.round(data.used / data.total * 1000) / 10 + ' %');
+			valueField.text(Math.round(data.used / data.total * 1000) / 10 + '%');
+			if (data.usage > 0.85)
+			{
+				valueField.addClass('warning');
+			}
+			else
+			{
+				valueField.removeClass('warning');
+			}
 		}
 	};
 	var client = new AgentServerClient(function (msg) {
 		var jsonResponce = JSON.parse(msg);
-		f(jsonResponce.cpu_stat);
-		f2(jsonResponce.meminfo);
+		cpuStat(jsonResponce.cpu_stat);
+		memInfo(jsonResponce.meminfo);
 	});
 
 	var serverAddress = $('#server').val();
