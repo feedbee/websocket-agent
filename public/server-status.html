@@ -17,7 +17,7 @@
 
     <div id="processors" class="indicator-block">
     	<h2>Processors</h2>
-		<div><span id="processors-cpu0-label" class="label">cpu0</span><canvas id="processors-cpu0"></canvas><span id="processors-cpu0-value" class="value"></span></div>
+		<div><span id="processors-cpu0-label" class="label">cpu0</span><canvas id="processors-cpu0" width="300" height="20"></canvas><span id="processors-cpu0-value" class="value"></span></div>
     </div>
 
     <div id="memory" class="indicator-block">
@@ -46,7 +46,7 @@
 			if ($('#processors-' + key).length < 1)
 			{
 				$('#processors').append($('<div><span id="processors-' + key + '-label" class="label">' + key + '</span>'
-					+ '<canvas id="processors-' + key + '"></canvas>'
+					+ '<canvas id="processors-' + key + '"  width="300" height="20"></canvas>'
 					+ '<span id="processors-' + key + '-value" class="value"></span></div>'));
 			}
 
@@ -60,12 +60,17 @@
 
 			var lastX = 0;
 			var width = canvas.width;
+			var height = canvas.height;
 			types.forEach(function(element) {
 				var value = data[element.key];
 				ctx.fillStyle = element.color;
 				var segmentWidth = Math.round(value * width);
-				ctx.fillRect(lastX, 0, segmentWidth, canvas.height);
-				lastX += segmentWidth;
+				if (segmentWidth > 1)
+				{
+					ctx.fillRect(lastX+1, 1, segmentWidth-1, canvas.height-2);
+					lastX += segmentWidth;
+				}
+				
 			});
 
 			valueField.text(Math.round(data.usage * 1000) / 10 + '%');
@@ -107,8 +112,11 @@
 				var value = data[element.key];
 				ctx.fillStyle = element.color;
 				segmentWidth = Math.round(value / data.total * width);
-				ctx.fillRect(lastX, 0, segmentWidth, canvas.height);
-				lastX = lastX + segmentWidth;
+				if (segmentWidth > 1)
+				{
+					ctx.fillRect(lastX+1, 1, segmentWidth-1, canvas.height-2);
+					lastX += segmentWidth;
+				}
 			});
 
 			valueField.text(Math.round(data.used / data.total * 1000) / 10 + '%');

@@ -24,7 +24,7 @@ body {
 	margin: 5px 0;
 }
 .indicator-block canvas {
-	border: 1px solid #082F4A;
+	border: 1px solid #b1b2b8;
 	vertical-align: middle;
 	width: 300px;
 	height: 20px;
